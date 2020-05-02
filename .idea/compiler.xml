@@ -9,5 +9,6 @@
         <module name="selenide-ninja-plus" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="11" />
   </component>
 </project>
