@@ -9,10 +9,8 @@ import pages.Sidebar;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.Properties;
 
 import static com.codeborne.selenide.Selenide.screenshot;
 import static io.qameta.allure.Allure.addAttachment;
@@ -24,9 +22,18 @@ public class BaseTest {
 
     @BeforeMethod
     public void setup() {
-        Configuration.browser = "firefox";
-        Configuration.baseUrl = "http://ninjaplus-web:5000";
-        Configuration.timeout = 30000;
+        Properties properties = new Properties();
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("config.properties");
+
+        try {
+            properties.load(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Configuration.browser = properties.getProperty("browser");
+        Configuration.baseUrl = properties.getProperty("url");
+        Configuration.timeout = Long.parseLong(properties.getProperty("timeout"));
 
         loginPage = new LoginPage();
         sidebar = new Sidebar();
