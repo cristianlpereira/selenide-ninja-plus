@@ -1,9 +1,13 @@
 package libs;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import static java.nio.file.Files.readAllBytes;
 
 public class Database {
     private final String url = "jdbc:postgresql://pgdb/ninjaplus";
@@ -14,13 +18,24 @@ public class Database {
         return DriverManager.getConnection(url, user, pass);
     }
 
-    public void deleteMovie(String title) {
-        String sql = "delete from public.movies where title = ?";
+    public void resetMovies() {
+        String executionPath = System.getProperty("user.dir");
+        String os = System.getProperty("os.name");
+        String target;
+        String moviesSql;
+
+        if (os.contains("Windows")) {
+            target = executionPath + "\\src\\main\\resources\\sql\\movies.sql";
+        } else {
+            target = executionPath + "/src/main/resources/sql/movies.sql";
+        }
 
         try {
-            PreparedStatement preparedStatement = this.connect().prepareStatement(sql);
-            preparedStatement.setString(1, title);
+            moviesSql = new String(readAllBytes(Paths.get(target)));
+            PreparedStatement preparedStatement = this.connect().prepareStatement(moviesSql);
             preparedStatement.executeQuery();
+        } catch (IOException e) {
+            e.printStackTrace();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }

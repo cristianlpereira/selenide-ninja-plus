@@ -53,4 +53,12 @@ public class MoviePage {
     public ElementsCollection items() {
         return $$("table tbody tr");
     }
+
+    public MoviePage search(String value) {
+        $("input[placeholder^=Pesquisar]").setValue(value);
+        $("#search-movie").click();
+
+        return this;
+    }
+
 }

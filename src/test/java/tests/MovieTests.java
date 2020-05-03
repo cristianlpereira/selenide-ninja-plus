@@ -3,7 +3,9 @@ package tests;
 import common.BaseTest;
 import libs.Database;
 import models.MovieModel;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
@@ -12,10 +14,18 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 
 public class MovieTests extends BaseTest {
+    private Database database;
+
     @BeforeMethod
     public void login() {
         loginPage.open().with("papito@ninjaplus.com", "pwd123");
         sidebar.loggedUser().shouldHave(text("Papito"));
+    }
+
+    @BeforeSuite
+    public void setupDatabase() {
+        database = new Database();
+        database.resetMovies();
     }
 
     @Test
@@ -33,9 +43,16 @@ public class MovieTests extends BaseTest {
                 "jumanji_next_fase_cover.jpg"
         );
 
-        Database database = new Database();
-        database.deleteMovie(movieModel.getTitle());
-
         moviePage.add().create(movieModel).items().findBy(text(movieModel.title)).shouldBe(visible);
+    }
+
+    @Test
+    public void shouldSearchTwoMovies() {
+        moviePage.search("Batman").items().shouldHaveSize(2);
+    }
+
+    @AfterMethod
+    public void cleanup() {
+        loginPage.clearSession();
     }
 }
